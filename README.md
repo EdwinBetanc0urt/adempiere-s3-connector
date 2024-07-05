@@ -28,6 +28,7 @@ The files are store depending of follow parameters:
 
 #### Images
 
+![Image](docs/adempiere-image.png)
 ![Image](docs/minio-image.png)
 
 - Client ID: `8d4e103d-6add-474f-948d-3d9bcbe7b541`
@@ -42,6 +43,7 @@ The route to store this resource is `<bucket name>/8d4e103d-6add-474f-948d-3d9bc
 
 #### Archives
 
+![Image](docs/adempiere-archive.png)
 ![Image](docs/minio-archive.png)
 
 - Client ID: `8d4e103d-6add-474f-948d-3d9bcbe7b541`
@@ -56,6 +58,7 @@ The route to store this resource is `<bucket name>/8d4e103d-6add-474f-948d-3d9bc
 
 #### Attachments
 
+![Image](docs/adempiere-attachment.png)
 ![Image](docs/minio-attachment.png)
 
 ##### File 1
