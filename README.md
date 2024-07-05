@@ -28,6 +28,8 @@ The files are store depending of follow parameters:
 
 #### Images
 
+![Image](docs/minio-image.png)
+
 - Client ID: `8d4e103d-6add-474f-948d-3d9bcbe7b541`
 - Container Type: `resource`
 - Container ID: `image`
@@ -40,6 +42,8 @@ The route to store this resource is `<bucket name>/8d4e103d-6add-474f-948d-3d9bc
 
 #### Archives
 
+![Image](docs/minio-archive.png)
+
 - Client ID: `8d4e103d-6add-474f-948d-3d9bcbe7b541`
 - Container Type: `resource`
 - Container ID: `archive`
@@ -51,6 +55,8 @@ The route to store this resource is `<bucket name>/8d4e103d-6add-474f-948d-3d9bc
 The route to store this resource is `<bucket name>/8d4e103d-6add-474f-948d-3d9bcbe7b541/client/resource/archive/ad_appregistration/1000000/gardenworld---application-registration.pdf`
 
 #### Attachments
+
+![Image](docs/minio-attachment.png)
 
 ##### File 1
   - Client ID: `8d4e103d-6add-474f-948d-3d9bcbe7b541`
