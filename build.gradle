@@ -28,6 +28,7 @@ dependencies {
     )
     //	ADempiere Core
     api "${baseGroupId}:base:${baseVersion}"
+    api "com.amazonaws:aws-java-sdk-s3:1.12.756"
 }
 
 sourceSets {
@@ -73,12 +74,12 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
 			groupId = group
-			artifactId = 'adempiere-template-project'
+			artifactId = 'adempiere-s3-connector'
 			version = version
            	from components.java
            	pom {
-                name = 'ADempiere Template Project'
-                description = 'Fill it with project description'
+                name = 'ADempiere S3 Connector'
+                description = 'A S3 Connector for ADempiere'
                 url = 'http://adempiere.io/'
                 licenses {
                     license {
@@ -94,9 +95,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://github.com/adempiere/adempiere-template-project.git'
-                    developerConnection = 'scm:git:ssh://github.com/adempiere/adempiere-template-project.git'
-                    url = 'http://github.com/adempiere/adempiere-template-project'
+                    connection = 'scm:git:git://github.com/adempiere/adempiere-s3-connector.git'
+                    developerConnection = 'scm:git:ssh://github.com/adempiere/adempiere-s3-connector.git'
+                    url = 'http://github.com/adempiere/adempiere-s3-connector'
                 }
             }
 		}
