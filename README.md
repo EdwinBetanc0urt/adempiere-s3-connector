@@ -1,29 +1,89 @@
-# ADempiere Template Project
+# ADempiere S3 Connector
 
-Fill it with a comment about project.
+A AWS3 Connector to use as File Storage
 
 ## Requirements
 - [JDK 11 or later](https://adoptium.net/)
 - [Gradle 8.0.1 or later](https://gradle.org/install/)
 
+## Model Deploy class
+The main deploy is `org.spin.eca62.setup.Deploy`, used to connect this plibrary with a minio instance like is generated [here](https://github.com/adempiere/s3_gateway_rs/blob/main/docker-compose/docker-compose-develop.yml)
 
-### Packages Names
-you should change the follows packages for your own implementation, just change the word `template` by your implementation
+## ADempiere Patches
+Currently the old implementation for ADempiere not work with the new definition, here a example of new definition `org.spin.util.AttachmentUtil`
 
-```Java
-org.spin.template.model.validator
-org.spin.template.setup
-org.spin.template.util
-```
+## S3 File Structure
 
-### Model Validators
-Change the `org.spin.template.model.validator.Validator` by your implementation, example: `org.spin.template.model.validator.MyOwnFunctionality`
+The files are store depending of follow parameters:
 
-### Model Deploy class
-Change the `org.spin.template.setup.Deploy` by your implementation, example: `org.spin.template.setup.MyOwnSetupForDeploy`
+- Client ID
+- Container Type
+- Container ID
+- Table
+- Record ID
+- User ID
+- Resource Name
 
-### Model Util class for core changes
-Change the `org.spin.template.util.Changes` by your implementation, example: `org.spin.template.util.MyOwnChanges`
+### Some Examples
+
+#### Images
+
+- Client ID: `8d4e103d-6add-474f-948d-3d9bcbe7b541`
+- Container Type: `resource`
+- Container ID: `image`
+- Table: No apply
+- Record ID: No apply
+- User ID: No apply
+- Resource Name: `2024-04-01_10-16.png`
+
+The route to store this resource is `<bucket name>/8d4e103d-6add-474f-948d-3d9bcbe7b541/client/resource/image/2024-04-01_10-16.png`
+
+#### Archives
+
+- Client ID: `8d4e103d-6add-474f-948d-3d9bcbe7b541`
+- Container Type: `resource`
+- Container ID: `archive`
+- Table: `AD_AppRegistration`
+- Record ID: `1000000`
+- User ID: No apply
+- Resource Name: `GardenWorld---Application-Registration.pdf`
+
+The route to store this resource is `<bucket name>/8d4e103d-6add-474f-948d-3d9bcbe7b541/client/resource/archive/ad_appregistration/1000000/gardenworld---application-registration.pdf`
+
+#### Attachments
+
+##### File 1
+  - Client ID: `8d4e103d-6add-474f-948d-3d9bcbe7b541`
+  - Container Type: `attachment`
+  - Container ID: No Apply
+  - Table: `AD_AppRegistration`
+  - Record ID: `1000000`
+  - User ID: No apply
+  - Resource Name: `-2024-02-10-2119.png`
+
+The route to store this resource is `<bucket name>/8d4e103d-6add-474f-948d-3d9bcbe7b541/client/attachment/ad_appregistration/1000000/-2024-02-10-2119.png`
+
+##### File 2
+  - Client ID: `8d4e103d-6add-474f-948d-3d9bcbe7b541`
+  - Container Type: `attachment`
+  - Container ID: No Apply
+  - Table: `AD_AppRegistration`
+  - Record ID: `1000000`
+  - User ID: No apply
+  - Resource Name: `09920_eca62_add_app_support.xml`
+
+The route to store this resource is `<bucket name>/8d4e103d-6add-474f-948d-3d9bcbe7b541/client/attachment/ad_appregistration/1000000/09920_eca62_add_app_support.xml`
+
+##### File 3
+  - Client ID: `8d4e103d-6add-474f-948d-3d9bcbe7b541`
+  - Container Type: `attachment`
+  - Container ID: No Apply
+  - Table: `AD_AppRegistration`
+  - Record ID: `1000000`
+  - User ID: No apply
+  - Resource Name: `a.xml`
+
+The route to store this resource is `<bucket name>/8d4e103d-6add-474f-948d-3d9bcbe7b541/client/attachment/ad_appregistration/1000000/a.xml`
 
 ## Binary Project
 
