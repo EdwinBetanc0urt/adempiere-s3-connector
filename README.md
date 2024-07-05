@@ -128,3 +128,7 @@ libraryDependencies += "io.github.adempiere" % "adempiere-s3-connector" % "1.0.0
     <version>1.0.0</version>
 </dependency>
 ```
+
+## Whatelse?
+
+Is nice to have a reference of table and column of image reference, the problem right now is that these reference is manage by Adempiere controller and the patch add for `AttachmentUtil` is located in model layer.
