@@ -34,12 +34,12 @@ The files are store depending of follow parameters:
 - Client ID: `8d4e103d-6add-474f-948d-3d9bcbe7b541`
 - Container Type: `resource`
 - Container ID: `image`
-- Table: No apply
-- Record ID: No apply
+- Table: `AD_Image`
+- Record ID: `1000002`
 - User ID: No apply
 - Resource Name: `2024-04-01_10-16.png`
 
-The route to store this resource is `<bucket name>/8d4e103d-6add-474f-948d-3d9bcbe7b541/client/resource/image/2024-04-01_10-16.png`
+The route to store this resource is `<bucket name>/8d4e103d-6add-474f-948d-3d9bcbe7b541/client/resource/image/ad_image/1000002/2024-04-01_10-16.png`
 
 #### Archives
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.adempiere.core.domains.models.I_AD_Image;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MArchive;
 import org.compiere.model.MAttachment;
@@ -487,6 +488,8 @@ public class AttachmentUtil {
 					.withClientId(attachmentReference.getAD_Client_ID())
 					.withContainerType(ResourceMetadata.ContainerType.RESOURCE)
 					.withContainerId("image")
+					.withTableName(I_AD_Image.Table_Name)
+					.withRecordId(attachmentReference.getAD_Image_ID())
 					.withName(attachmentReference.getFileName())
 					.getResourceFileName()
 					;
