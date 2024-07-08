@@ -30,6 +30,7 @@ import org.compiere.model.MClientInfo;
 import org.compiere.model.MTable;
 import org.compiere.util.Env;
 import org.compiere.util.Util;
+import org.spin.eca62.support.IS3;
 import org.spin.eca62.support.ResourceMetadata;
 import org.spin.model.MADAppRegistration;
 import org.spin.model.MADAttachmentReference;
@@ -67,6 +68,17 @@ public class AttachmentUtil {
 	private int imageId;
 	private int archiveId;
 	private String transactionName;
+	private String baseFolder;
+	private String imageFolder;
+	private String attachmentFolder;
+	private String archiveFolder;
+	private String tmpFolder;
+	
+	private final String BASE_FOLDER_PARAMETER = "BaseFolder";
+	private final String IMAGE_FOLDER_PARAMETER = "ImageFolder";
+	private final String ATTACHMENT_FOLDER_PARAMETER = "AttachmentFolder";
+	private final String ARCHIVE_FOLDER_PARAMETER = "ArchiveFolder";
+	private final String TMP_FOLDER_PARAMETER = "TmpFolder";
 	
 	/**
 	 * Private constructor
@@ -332,7 +344,7 @@ public class AttachmentUtil {
 		description = attachmentReference.getDescription();
 		note = attachmentReference.getTextMsg();
 		//	Get data
-		InputStream inputStream = handler.getResource(getCompleteFileName(attachmentReference));
+		InputStream inputStream = handler.getResource(getCompleteFileName(attachmentReference, handler));
 		if(inputStream == null) {
 			throw new AdempiereException("@FileName@ @NotFound@");
 		}
@@ -434,7 +446,7 @@ public class AttachmentUtil {
 			//	Save
 			attachmentReference.saveEx();
 			//	Save
-			handler.putResource(getCompleteFileName(attachmentReference), data);
+			handler.putResource(getCompleteFileName(attachmentReference, handler), data);
 		} catch (Exception e) {
 			if(attachmentReference.getAD_AttachmentReference_ID() > 0) {
 				attachmentReference.deleteEx(true);
@@ -456,7 +468,7 @@ public class AttachmentUtil {
 		}
 		try {
 			//	Save
-			handler.deleteResource(getCompleteFileName(attachmentReference));
+			handler.deleteResource(getCompleteFileName(attachmentReference, handler));
 			//	Remove from cache
 			MADAttachmentReference.resetAttachmentReferenceCache(fileHandlerId, attachmentReference);
 			//	Delete reference
@@ -471,42 +483,102 @@ public class AttachmentUtil {
 	 * @param attachmentReference
 	 * @return
 	 */
-	private String getCompleteFileName(MADAttachmentReference attachmentReference) {
-		if(attachmentReference.getAD_Attachment_ID() > 0) {
-			MAttachment attachment = new MAttachment(context, attachmentReference.getAD_Attachment_ID(), attachmentReference.get_TrxName());
-			String tableName = MTable.getTableName(context, attachment.getAD_Table_ID());
-			return ResourceMetadata.newInstance()
-					.withClientId(attachmentReference.getAD_Client_ID())
-					.withContainerType(ResourceMetadata.ContainerType.ATTACHMENT)
-					.withTableName(tableName)
-					.withRecordId(attachment.getRecord_ID())
-					.withName(attachmentReference.getFileName())
-					.getResourceFileName()
-					;
-		} else if(attachmentReference.getAD_Image_ID() > 0) {
-			return ResourceMetadata.newInstance()
-					.withClientId(attachmentReference.getAD_Client_ID())
-					.withContainerType(ResourceMetadata.ContainerType.RESOURCE)
-					.withContainerId("image")
-					.withTableName(I_AD_Image.Table_Name)
-					.withRecordId(attachmentReference.getAD_Image_ID())
-					.withName(attachmentReference.getFileName())
-					.getResourceFileName()
-					;
-		} else if(attachmentReference.getAD_Archive_ID() > 0) {
-			MArchive archive = new MArchive(context, attachmentReference.getAD_Archive_ID(), attachmentReference.get_TrxName());
-			String tableName = MTable.getTableName(context, archive.getAD_Table_ID());
-			return ResourceMetadata.newInstance()
-					.withClientId(attachmentReference.getAD_Client_ID())
-					.withContainerType(ResourceMetadata.ContainerType.RESOURCE)
-					.withContainerId("archive")
-					.withTableName(tableName)
-					.withRecordId(archive.getRecord_ID())
-					.withName(attachmentReference.getFileName())
-					.getResourceFileName()
-					;
+	private String getCompleteFileName(MADAttachmentReference attachmentReference, IWebDav handler) {
+		if(IS3.class.isAssignableFrom(handler.getClass())) {
+			if(attachmentReference.getAD_Attachment_ID() > 0) {
+				MAttachment attachment = new MAttachment(context, attachmentReference.getAD_Attachment_ID(), attachmentReference.get_TrxName());
+				String tableName = MTable.getTableName(context, attachment.getAD_Table_ID());
+				return ResourceMetadata.newInstance()
+						.withClientId(attachmentReference.getAD_Client_ID())
+						.withContainerType(ResourceMetadata.ContainerType.ATTACHMENT)
+						.withTableName(tableName)
+						.withRecordId(attachment.getRecord_ID())
+						.withName(attachmentReference.getFileName())
+						.getResourceFileName()
+						;
+			} else if(attachmentReference.getAD_Image_ID() > 0) {
+				return ResourceMetadata.newInstance()
+						.withClientId(attachmentReference.getAD_Client_ID())
+						.withContainerType(ResourceMetadata.ContainerType.RESOURCE)
+						.withContainerId("image")
+						.withTableName(I_AD_Image.Table_Name)
+						.withRecordId(attachmentReference.getAD_Image_ID())
+						.withName(attachmentReference.getFileName())
+						.getResourceFileName()
+						;
+			} else if(attachmentReference.getAD_Archive_ID() > 0) {
+				MArchive archive = new MArchive(context, attachmentReference.getAD_Archive_ID(), attachmentReference.get_TrxName());
+				String tableName = MTable.getTableName(context, archive.getAD_Table_ID());
+				return ResourceMetadata.newInstance()
+						.withClientId(attachmentReference.getAD_Client_ID())
+						.withContainerType(ResourceMetadata.ContainerType.RESOURCE)
+						.withContainerId("archive")
+						.withTableName(tableName)
+						.withRecordId(archive.getRecord_ID())
+						.withName(attachmentReference.getFileName())
+						.getResourceFileName()
+						;
+			}
+		} else {
+			return getCompleteFileNameOld(attachmentReference);
 		}
 		return null;
+	}
+	
+	/**
+	 * Get complete path from attachment reference
+	 * @param attachmentReference
+	 * @return
+	 */
+	private String getCompleteFileNameOld(MADAttachmentReference attachmentReference) {
+		String fileName = attachmentReference.getValidFileName();
+		String validForlder = getValidFolder(attachmentReference);
+		String completePath = fileName;
+		if(!Util.isEmpty(validForlder)) {
+			completePath = addSubFolder(validForlder, fileName);
+		}
+		return completePath;
+	}
+	
+	/**
+	 * Get valid folder for all
+	 * @param attachmentReference
+	 * @return
+	 */
+	private String getValidFolder(MADAttachmentReference attachmentReference) {
+		String validForlder = "";
+		//	For attachment
+		if(attachmentReference.getAD_Attachment_ID() > 0) {
+			validForlder = addSubFolder(baseFolder, attachmentFolder);
+		} else if(attachmentReference.getAD_Image_ID() > 0) {
+			validForlder = addSubFolder(baseFolder, imageFolder);
+		} else if(attachmentReference.getAD_Archive_ID() > 0) {
+			validForlder = addSubFolder(baseFolder, archiveFolder);
+		}
+		if(Util.isEmpty(validForlder)) {
+			validForlder = "";
+		}
+		return validForlder;
+	}
+	
+	/**
+	 * Get and Add sub-folder
+	 * @param baseFolder
+	 * @param subFolder
+	 * @return
+	 */
+	private String addSubFolder(String baseFolder, String subFolder) {
+		String completePath = "";
+		if(!Util.isEmpty(baseFolder)) {
+			completePath = baseFolder;
+		}
+		//	Sub-Folder
+		if(!Util.isEmpty(completePath)) {
+			completePath = completePath + "/" + subFolder;
+		} else {
+			completePath = subFolder;
+		}
+		return completePath;
 	}
 	
 	/**
@@ -539,6 +611,8 @@ public class AttachmentUtil {
 		if(registration == null) {
 			throw new AdempiereException("@AD_AppRegistration_ID@ @NotFound@");
 		}
+		//	Process Folders
+		processFolder(registration);
 		//	Load
 		IAppSupport supportedApi = AppSupportHandler.getInstance().getAppSupport(MADAppRegistration.getById(context, fileHandlerId, transactionName));
 		if(supportedApi == null) {
@@ -550,5 +624,44 @@ public class AttachmentUtil {
 		//	
 		fileHandler = (IWebDav) supportedApi;
 		return fileHandler;
+	}
+	
+	/**
+	 * Process folder for a valid name
+	 * @param folder
+	 * @return
+	 */
+	private void processFolder(MADAppRegistration registration) {
+		baseFolder = getValidFolder(registration.getParameterValue(BASE_FOLDER_PARAMETER));
+		imageFolder = getValidFolder(registration.getParameterValue(IMAGE_FOLDER_PARAMETER));
+		if(Util.isEmpty(imageFolder)) {
+			imageFolder = "Images";
+		}
+		attachmentFolder = getValidFolder(registration.getParameterValue(ATTACHMENT_FOLDER_PARAMETER));
+		if(Util.isEmpty(attachmentFolder)) {
+			attachmentFolder = "Attachments";
+		}
+		archiveFolder = getValidFolder(registration.getParameterValue(ARCHIVE_FOLDER_PARAMETER));
+		if(Util.isEmpty(archiveFolder)) {
+			archiveFolder = "Archives";
+		}
+		tmpFolder = getValidFolder(registration.getParameterValue(TMP_FOLDER_PARAMETER));
+		if(Util.isEmpty(tmpFolder)) {
+			tmpFolder = "Tmp";
+		}
+	}
+	
+	/**
+	 * get valid Folder Name
+	 * @param folder
+	 * @return
+	 */
+	private String getValidFolder(String folder) {
+		if(Util.isEmpty(folder)) {
+			folder = "";
+		} else if(folder.endsWith("/")) {
+			folder.substring(0, folder.length() - 1);
+		}
+		return folder;
 	}
 }
