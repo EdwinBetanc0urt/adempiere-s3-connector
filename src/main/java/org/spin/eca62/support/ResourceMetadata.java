@@ -38,6 +38,7 @@ public class ResourceMetadata {
 	private String columnName;
 	private int recordId;
 	private String name;
+	private String resourceName;
 	private ContainerType containerType;
 	
 	public enum ContainerType {
@@ -110,6 +111,11 @@ public class ResourceMetadata {
 
 	public ResourceMetadata withName(String name) {
 		this.name = name;
+		return this;
+	}
+	
+	public ResourceMetadata withResourceName(String resourceName) {
+		this.resourceName = resourceName;
 		return this;
 	}
 	
@@ -200,6 +206,9 @@ public class ResourceMetadata {
 	}
 	
 	public String getResourceFileName() {
+		if(!Util.isEmpty(resourceName)) {
+			return resourceName;
+		}
 		if(Util.isEmpty(name)) {
 			throw new AdempiereException("Resource Name is Mandatory");
 		}
