@@ -19,6 +19,8 @@ package org.spin.eca62.setup;
 import java.util.Properties;
 
 import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.MClientInfo;
+import org.compiere.util.Env;
 import org.spin.model.MADAppRegistration;
 import org.spin.model.MADAppSupport;
 import org.spin.util.ISetupDefinition;
@@ -33,12 +35,16 @@ public class Deploy implements ISetupDefinition {
 	
 	@Override
 	public String doIt(Properties context, String transactionName) {
-		//	
-		createConnection(context, transactionName);
+		//	create App Registration
+		MADAppRegistration appRegistration = createConnection(context, transactionName);
+
+		//	Set App Registration to Client Info
+		configClient(context, appRegistration, transactionName);
+
 		return "@AD_SetupDefinition_ID@ @Ok@";
 	}
 
-	private void createConnection(Properties context, String transactionName) {
+	private MADAppRegistration createConnection(Properties context, String transactionName) {
 		MADAppRegistration aws3Connection = MADAppRegistration.getByApplicationType(context, APP_TYPE, transactionName);
 		if(aws3Connection == null
 				|| aws3Connection.getAD_AppRegistration_ID() <= 0) {
@@ -57,5 +63,16 @@ public class Deploy implements ISetupDefinition {
 			aws3Connection.setPort(9000);
 			aws3Connection.saveEx();
 		}
+		return aws3Connection;
 	}
+
+	private void configClient(Properties context, MADAppRegistration aws3Connection, String transactionName) {
+		int clientId = Env.getAD_Client_ID(context);
+		MClientInfo clientInfo = MClientInfo.get(context, clientId, transactionName);
+		clientInfo.setFileHandler_ID(
+			aws3Connection.getAD_AppRegistration_ID()
+		);
+		clientInfo.saveEx();
+	}
+
 }
