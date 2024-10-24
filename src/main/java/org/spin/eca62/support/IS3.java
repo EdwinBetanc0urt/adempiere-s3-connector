@@ -16,6 +16,7 @@
  *****************************************************************************/
 package org.spin.eca62.support;
 
+import java.io.File;
 import java.io.InputStream;
 
 /**
@@ -40,4 +41,12 @@ public interface IS3 {
 	 * @throws Exception
 	 */
 	public InputStream getResource(ResourceMetadata resourceMetadata) throws Exception;
+	
+	/**
+	 * Put a Temporary Resource
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	public String putTemporaryFile(File file) throws Exception;
 }
