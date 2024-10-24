@@ -25,13 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.adempiere.exceptions.AdempiereException;
-import org.compiere.model.MClientInfo;
 import org.compiere.util.Env;
 import org.compiere.util.MimeType;
 import org.compiere.util.Util;
 import org.spin.model.MADAppRegistration;
-import org.spin.util.support.AppSupportHandler;
-import org.spin.util.support.IAppSupport;
 import org.spin.util.support.webdav.IWebDav;
 import org.spin.util.support.webdav.IWebDavResource;
 
@@ -308,38 +305,14 @@ public class S3 implements IWebDav, IS3 {
 	 */
 	@Override
 	public String putTemporaryFile(File file) throws Exception {
-		try {
-		    //	Push to S3
-		    MClientInfo clientInfo = MClientInfo.get(Env.getCtx());
-		    if(clientInfo.getFileHandler_ID() <= 0) {
-		    	throw new AdempiereException("@FileHandler_ID@ @NotFound@");
-		    }
-		    MADAppRegistration genericConnector = MADAppRegistration.getById(Env.getCtx(), clientInfo.getFileHandler_ID(), null);
-		    if(genericConnector == null) {
-				throw new AdempiereException("@AD_AppRegistration_ID@ @NotFound@");
-			}
-			//	Load
-			IAppSupport supportedApi = AppSupportHandler.getInstance().getAppSupport(genericConnector);
-			if(supportedApi == null) {
-				throw new AdempiereException("@AD_AppSupport_ID@ @NotFound@");
-			}
-			if(!IS3.class.isAssignableFrom(supportedApi.getClass())) {
-				throw new AdempiereException("@AD_AppSupport_ID@ @Unsupported@");
-			}
-			//	Push it
-			IS3 fileHandler = (IS3) supportedApi;
-			ResourceMetadata resourceMetadata = ResourceMetadata.newInstance()
-					.withClientId(Env.getAD_Client_ID(Env.getCtx()))
-					.withUserId(Env.getAD_User_ID(Env.getCtx()))
-					.withContainerType(ResourceMetadata.ContainerType.RESOURCE)
-					.withContainerId("tmp")
-					.withName(file.getName())
-					;
-			String fileName = fileHandler.putResource(resourceMetadata, new FileInputStream(file));
-			return fileName;
-		} catch (Exception e) {
-			throw new AdempiereException(e);
-		}
+		ResourceMetadata resourceMetadata = ResourceMetadata.newInstance()
+				.withClientId(Env.getAD_Client_ID(Env.getCtx()))
+				.withUserId(Env.getAD_User_ID(Env.getCtx()))
+				.withContainerType(ResourceMetadata.ContainerType.RESOURCE)
+				.withContainerId("tmp")
+				.withName(file.getName())
+				;
+		return putResource(resourceMetadata, new FileInputStream(file));
 	}
 
 	@Override
